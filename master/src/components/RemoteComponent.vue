@@ -16,15 +16,20 @@ export default {
       this.loadComponent()
     })
   },
+  beforeDestroy () {
+    if (this.vm && this.vm.$destroy) {
+      this.vm.$destroy()
+    }
+  },
   methods: {
     loadComponent () {
       fetch(this.url).then(res => res.text()).then((code) => {
         try {
           const module = eval(code)
           if (module && module.bootstrap && typeof module.bootstrap === 'function') {
-            module.bootstrap(this.$refs.container, this.$attrs)
+            this.vm = module.bootstrap(this.$refs.container, this.$attrs)
           } else if (window[APP_LOADER_NAME]) {
-            window[APP_LOADER_NAME].bootstrap(this.$refs.container, this.$attrs)
+            this.vm = window[APP_LOADER_NAME].bootstrap(this.$refs.container, this.$attrs)
           }
         } catch (e) {
           console.error(e)
