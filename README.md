@@ -9,3 +9,5 @@ css 隔离通过 vue scope 方式解决。
 > __master__ 为主应用（外壳）
 
 > __app1__、__app2__ 为子应用
+
+TODO: 增加 js 隔离方案
