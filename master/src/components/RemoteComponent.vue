@@ -5,7 +5,10 @@
 </template>
 
 <script>
+import ModuleLoader from '../utils/module-loader'
 const APP_LOADER_NAME = '__REMOTE_LOADED_APP__'
+
+const mloader = new ModuleLoader()
 
 export default {
   props: {
@@ -23,7 +26,11 @@ export default {
   },
   methods: {
     loadComponent () {
-      fetch(this.url).then(res => res.text()).then((code) => {
+      mloader.load(this.url).then(code => {
+        if (!code) {
+          return
+        }
+
         try {
           const module = eval(code)
           if (module && module.bootstrap && typeof module.bootstrap === 'function') {
