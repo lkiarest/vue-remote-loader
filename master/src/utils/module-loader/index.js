@@ -1,3 +1,5 @@
+const APP_LOADER_NAME = '__REMOTE_LOADED_APP__'
+
 export default class ModuleLoader {
   constructor () {
     this.requests = {}
@@ -27,9 +29,37 @@ export default class ModuleLoader {
           console.error(e)
           return ''
         }).then(text => {
+          const module = (function moduleRunner() {
+            let result = null
+
+            Object.defineProperty(window, APP_LOADER_NAME, {
+              configurable: true,
+              set (value) {
+                result = value
+              }
+            })
+
+            try {
+              const func = new Function(text)
+              func()
+            } catch (e) {
+              console.error('远程模块执行错误', e)
+            }
+
+            delete window[APP_LOADER_NAME]
+
+            return result
+          })()
+
+          if (module && module.bootstrap && typeof module.bootstrap === 'function') {
+            cached[url] = module
+          } else {
+            cached[url] = null
+          }
+
           const callbacks = requests[url]
           if (callbacks && callbacks.length > 0) {
-            callbacks.forEach(callback => callback(text))
+            callbacks.forEach(callback => callback(cached[url]))
             requests[url] = null
           }
         })

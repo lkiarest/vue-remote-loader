@@ -21,6 +21,7 @@ module.exports = {
     optimization: {
       minimize: true,
       minimizer: [new TerserPlugin({
+        sourceMap: true,
         extractComments: true,
         terserOptions: {
           output: {
